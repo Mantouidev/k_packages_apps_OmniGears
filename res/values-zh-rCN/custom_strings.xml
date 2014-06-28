@@ -544,13 +544,13 @@
     <string name="navigation_bar_height_landscape_summary">（横屏）导航栏高度.</string>
     <string name="navigation_bar_width_title">导航栏宽度</string>
     <string name="navigation_bar_width_summary">导航栏位于右边缘时的宽度.</string>
-    <string name="navigation_bar_size_42_dp_default">42 dp (默认)</string>
+    <string name="navigation_bar_size_42_dp_default">42 dp</string>
     <string name="navigation_bar_size_36_dp">36 dp</string>
     <string name="navigation_bar_size_30_dp">30 dp</string>
     <string name="navigation_bar_size_24_dp">24 dp</string>
-    <string name="navigation_bar_size_48_dp_default">48 dp (默认)</string>
+    <string name="navigation_bar_size_48_dp_default">48 dp</string>
     <string name="navigation_bar_size_44_dp">44 dp</string>
-    <string name="navigation_bar_size_40_dp">40 dp</string>
+    <string name="navigation_bar_size_40_dp">40 dp (默认)</string>
     <string name="navigation_bar_size_42_dp">42 dp</string>
     <string name="navigation_bar_size_0_dp">0 dp (关闭)</string>
 
