@@ -572,4 +572,5 @@
    <!-- Lockscreen immersive mode -->
    <string name="category_immersive_mode_title">Immersive mode</string>
    <string name="lockscreen_immersive_mode_title">Disable immersive mode</string>
+   <string name="lockscreen_immersive_mode_summary">Only valid in lock screen mode</string>
 </resources>

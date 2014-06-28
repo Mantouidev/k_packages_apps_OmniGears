@@ -81,5 +81,6 @@
             <org.omnirom.omnigears.preference.SystemCheckBoxPreference
                     android:key="lockscreen_immersive_mode"
                     android:title="@string/lockscreen_immersive_mode_title"
+                    android:summary="@string/lockscreen_immersive_mode_summary"
                     android:defaultValue="false" />
 </PreferenceScreen>
