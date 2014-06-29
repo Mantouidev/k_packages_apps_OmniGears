@@ -129,7 +129,7 @@ public class LockscreenSettings extends SettingsPreferenceFragment implements
 
         mBlurRadius = (SeekBarPreference) findPreference(KEY_BLUR_RADIUS);
         mBlurRadius.setValue(Settings.System.getInt(resolver,
-                Settings.System.LOCKSCREEN_BLUR_RADIUS, 12));
+                Settings.System.LOCKSCREEN_BLUR_RADIUS, 3));
         mBlurRadius.setOnPreferenceChangeListener(this);
     }
 
