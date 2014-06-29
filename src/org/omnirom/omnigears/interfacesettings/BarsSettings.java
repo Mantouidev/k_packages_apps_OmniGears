@@ -21,8 +21,11 @@ package org.omnirom.omnigears.interfacesettings;
 import com.android.settings.SettingsPreferenceFragment;
 import com.android.settings.R;
 
+import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.net.TrafficStats;
 import android.os.Bundle;
@@ -36,6 +39,9 @@ import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
+import android.text.Spannable;
+import android.text.TextUtils;
+import android.widget.EditText;
 
 import com.android.internal.util.omni.DeviceUtils;
 import com.android.settings.Utils;
@@ -50,6 +56,8 @@ public class BarsSettings extends SettingsPreferenceFragment implements
     private static final String SMART_PULLDOWN = "smart_pulldown";
     private static final String QUICKSETTINGS_DYNAMIC = "quicksettings_dynamic_row";
     private static final String CATEGORY_NAVBAR = "category_navigation_bar";
+    private static final String STATUS_BAR_CARRIER = "status_bar_carrier";
+    private static final String CUSTOM_CARRIER_LABEL = "custom_carrier_label";
     private static final String NETWORK_TRAFFIC_STATE = "network_traffic_state";
     private static final String NETWORK_TRAFFIC_UNIT = "network_traffic_unit";
     private static final String NETWORK_TRAFFIC_PERIOD = "network_traffic_period";
@@ -62,6 +70,9 @@ public class BarsSettings extends SettingsPreferenceFragment implements
     private CheckBoxPreference mQuickSettingsDynamic;
     private ListPreference mQuickPulldown;
     private ListPreference mSmartPulldown;
+    private CheckBoxPreference mStatusBarCarrier;
+    private PreferenceScreen mCustomStatusBarCarrierLabel;
+    private String mCustomStatusBarCarrierLabelText;
     private ListPreference mNetTrafficState;
     private ListPreference mNetTrafficUnit;
     private ListPreference mNetTrafficPeriod;
@@ -136,6 +147,13 @@ public class BarsSettings extends SettingsPreferenceFragment implements
                 Settings.System.STATUS_BAR_NETWORK_ACTIVITY, 0) == 1);
         mStatusBarNetworkActivity.setOnPreferenceChangeListener(this);
 
+        mStatusBarCarrier = (CheckBoxPreference) findPreference(STATUS_BAR_CARRIER);
+        mStatusBarCarrier.setChecked((Settings.System.getInt(resolver, Settings.System.STATUS_BAR_CARRIER, 0) == 1));
+        mStatusBarCarrier.setOnPreferenceChangeListener(this);
+
+        mCustomStatusBarCarrierLabel = (PreferenceScreen) findPreference(CUSTOM_CARRIER_LABEL);
+        updateCustomLabelTextSummary();
+
         mNetTrafficState = (ListPreference) prefSet.findPreference(NETWORK_TRAFFIC_STATE);
         mNetTrafficUnit = (ListPreference) prefSet.findPreference(NETWORK_TRAFFIC_UNIT);
         mNetTrafficPeriod = (ListPreference) prefSet.findPreference(NETWORK_TRAFFIC_PERIOD);
@@ -189,8 +207,45 @@ public class BarsSettings extends SettingsPreferenceFragment implements
 
     @Override
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
+        final ContentResolver resolver = getActivity().getContentResolver();
+        if (preference.getKey().equals(CUSTOM_CARRIER_LABEL)) {
+            AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
+            alert.setTitle(R.string.custom_carrier_label_title);
+            alert.setMessage(R.string.custom_carrier_label_explain);
+
+            // Set an EditText view to get user input
+            final EditText input = new EditText(getActivity());
+            input.setText(TextUtils.isEmpty(mCustomStatusBarCarrierLabelText) ? "" : mCustomStatusBarCarrierLabelText);
+
+            input.setSelection(input.getText().length());
+            alert.setView(input);
+            alert.setPositiveButton(getResources().getString(R.string.ok),
+                    new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    String value = ((Spannable) input.getText()).toString().trim();
+                    Settings.System.putString(resolver, Settings.System.CUSTOM_CARRIER_LABEL, value);
+                    updateCustomLabelTextSummary();
+                    Intent i = new Intent();
+                    i.setAction(Intent.ACTION_CUSTOM_CARRIER_LABEL_CHANGED);
+                    getActivity().sendBroadcast(i);
+                }
+            });
+           alert.setNegativeButton(getResources().getString(R.string.cancel), null);
+            alert.show();
+        }
         // If we didn't handle it, let preferences handle it.
         return super.onPreferenceTreeClick(preferenceScreen, preference);
+    }
+
+    private void updateCustomLabelTextSummary() {
+        mCustomStatusBarCarrierLabelText = Settings.System.getString(getActivity().getContentResolver(),
+            Settings.System.CUSTOM_CARRIER_LABEL);
+
+        if (TextUtils.isEmpty(mCustomStatusBarCarrierLabelText)) {
+            mCustomStatusBarCarrierLabel.setSummary(R.string.custom_carrier_label_notset);
+        } else {
+            mCustomStatusBarCarrierLabel.setSummary(mCustomStatusBarCarrierLabelText);
+        }
     }
 
     @Override
@@ -257,6 +312,10 @@ public class BarsSettings extends SettingsPreferenceFragment implements
             boolean value = (Boolean) objValue;
             Settings.System.putInt(resolver,
                 Settings.System.EMULATE_HW_MENU_KEY, value ? 1 : 0);
+        } else if (preference == mStatusBarCarrier) {
+            boolean value = (Boolean) objValue;
+            Settings.System.putInt(resolver, Settings.System.STATUS_BAR_CARRIER, value ? 1 : 0);
+            return true;
         } else {
             return false;
         }
